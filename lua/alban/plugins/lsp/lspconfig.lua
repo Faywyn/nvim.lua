@@ -124,5 +124,9 @@ lspconfig["pyright"].setup({
   on_attach = on_attach,
 })
 
-
+-- configure latex
+lspconfig["texlab"].setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+})
 
