@@ -81,7 +81,9 @@ return packer.startup(function(use)
       { "nvim-tree/nvim-web-devicons" },
       { "nvim-treesitter/nvim-treesitter" },
     },
-  }) -- enhanced lsp uis
+  })
+  use("lukas-reineke/lsp-format.nvim")
+  -- enhanced lsp uis
   use("jose-elias-alvarez/typescript.nvim") -- additional functionality for typescript server (e.g. rename file & update imports)
   use("onsails/lspkind.nvim") -- vs-code like icons for autocompletion
 
@@ -104,7 +106,6 @@ return packer.startup(function(use)
 
   -- VimTex
   use("lervag/vimtex")
-
 
   if packer_bootstrap then
     require("packer").sync()

@@ -58,5 +58,5 @@ keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if ne
 
 -- luasnip
 local ls = require("luasnip")
-keymap.set({"n", "s"}, "<C-j>", function() ls.jump( 1) end, {silent = true})
-keymap.set({"n", "s"}, "<C-k>", function() ls.jump(-1) end, {silent = true})
+keymap.set({"i", "s"}, "<C-j>", function() ls.jump( 1) end, {silent = true})
+keymap.set({"i", "s"}, "<C-k>", function() ls.jump(-1) end, {silent = true})
