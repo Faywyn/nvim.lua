@@ -106,6 +106,9 @@ return packer.startup(function(use)
   -- VimTex
   use("lervag/vimtex")
 
+  -- Ollama plugin
+  use("David-Kunz/gen.nvim")
+
   -- Lua
   use {
     "folke/which-key.nvim",

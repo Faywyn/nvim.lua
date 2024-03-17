@@ -144,3 +144,9 @@ lspconfig["ocamllsp"].setup({
   capabilities = capabilities,
   on_attach = on_attach,
 })
+
+-- configure vue
+lspconfig["volar"].setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+})

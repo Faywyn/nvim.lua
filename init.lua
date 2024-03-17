@@ -13,9 +13,8 @@ require("alban.plugins.nvim-cmp")
 require("alban.plugins.autopairs")
 require("alban.plugins.treesitter")
 require("alban.plugins.gitsigns")
+require("alban.plugins.gen")
 
 require("alban.plugins.lsp.mason")
 require("alban.plugins.lsp.lspsaga")
 require("alban.plugins.lsp.lspconfig")
-
-

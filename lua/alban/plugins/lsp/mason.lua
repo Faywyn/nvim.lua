@@ -30,9 +30,10 @@ mason_lspconfig.setup({
     "emmet_ls",
     "clangd",
     "pyright",
-    "ocamllsp"
+    "ocamllsp",
+    "volar"
+    -- "vue-language-server"
   },
   -- auto-install configured servers (with lspconfig)
   automatic_installation = true, -- not the same as ensure_installed
 })
-
