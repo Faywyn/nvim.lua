@@ -123,6 +123,7 @@ return packer.startup(function(use)
     end
   }
 
+  use("Faywynnn/llama-copilot.nvim")
 
   if packer_bootstrap then
     require("packer").sync()
