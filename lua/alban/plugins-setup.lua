@@ -30,9 +30,11 @@ end
 return packer.startup(function(use)
   use("wbthomason/packer.nvim")
 
-  use("nvim-lua/plenary.nvim")          -- lua functions that plugins use
+  use("nvim-lua/plenary.nvim")               -- lua functions that plugins use
 
-  use("bluz71/vim-nightfly-colors")     -- color theme
+  use("bluz71/vim-nightfly-colors")          -- color theme
+  use("polirritmico/monokai-nightasty.nvim") -- light
+
 
   use("christoomey/vim-tmux-navigator") -- tmux & split window navigation
 
@@ -123,7 +125,10 @@ return packer.startup(function(use)
     end
   }
 
-  use("Faywynnn/llama-copilot.nvim")
+  use {
+    "Faywyn/llama-copilot.nvim",
+    requires = "nvim-lua/plenary.nvim"
+  }
 
   if packer_bootstrap then
     require("packer").sync()
