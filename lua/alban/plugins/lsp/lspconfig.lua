@@ -10,19 +10,11 @@ if not cmp_nvim_lsp_status then
   return
 end
 
--- import typescript plugin safely
-local typescript_setup, typescript = pcall(require, "typescript")
-if not typescript_setup then
-  return
-end
-
 local f_setup, lsp_format = pcall(require, "lsp-format")
 if not f_setup then
   return
 end
 
-
-lsp_format.setup({})
 
 local keymap = vim.keymap
 
@@ -48,7 +40,7 @@ local on_attach = function(client, bufnr)
   keymap.set("n", "<leader>o", "<cmd>LSoutlineToggle<CR>", opts)                 -- see outline on right hand side
 
   -- typescript specific keymaps (e.g. rename file and update imports)
-  if client.name == "tsserver" then
+  if client.name == "ts_ls" then
     keymap.set("n", "<leader>rf", ":TypescriptRenameFile<CR>")      -- rename file and update imports
     keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports (not in youtube nvim video)
     keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>")    -- remove unused variables (not in youtube nvim video)
@@ -71,14 +63,6 @@ end
 lspconfig["html"].setup({
   capabilities = capabilities,
   on_attach = on_attach,
-})
-
--- configure typescript server with plugin
-typescript.setup({
-  server = {
-    capabilities = capabilities,
-    on_attach = on_attach,
-  },
 })
 
 -- configure css server
@@ -139,14 +123,25 @@ lspconfig["texlab"].setup({
   on_attach = on_attach,
 })
 
--- configure ocaml
+-- configure vue
+lspconfig["volar"].setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+})
+
+-- configure ocaml (installed via opam, not Mason)
 lspconfig["ocamllsp"].setup({
   capabilities = capabilities,
   on_attach = on_attach,
 })
 
--- configure vue
-lspconfig["volar"].setup({
+-- configure typescript server with plugin
+lspconfig["ts_ls"].setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+})
+
+lspconfig["jdtls"].setup({
   capabilities = capabilities,
   on_attach = on_attach,
 })

@@ -69,8 +69,14 @@ return packer.startup(function(use)
   use("rafamadriz/friendly-snippets") -- useful snippets
 
   -- managing & installing lsp servers, linters & formatters
-  use("williamboman/mason.nvim")           -- in charge of managing lsp servers, linters & formatters
-  use("williamboman/mason-lspconfig.nvim") -- bridges gap b/w mason & lspconfig
+  use({
+    "williamboman/mason.nvim",
+    tag = "v1.11.0",
+  })   -- in charge of managing lsp servers, linters & formatters
+  use({
+    "williamboman/mason-lspconfig.nvim",
+    tag = "v1.32.0",
+  }) -- bridges gap b/w mason & lspconfig
 
   -- configuring lsp servers
   use("neovim/nvim-lspconfig") -- easily configure language servers
@@ -125,9 +131,24 @@ return packer.startup(function(use)
     end
   }
 
+  -- Ollama code copilot
   use {
     "Faywyn/llama-copilot.nvim",
     requires = "nvim-lua/plenary.nvim"
+  }
+
+  -- Copilot
+  use {
+    "github/copilot.vim"
+  }
+
+  -- Flutter
+  use {
+    'nvim-flutter/flutter-tools.nvim',
+    requires = {
+      'nvim-lua/plenary.nvim',
+      'stevearc/dressing.nvim', -- optional for vim.ui.select
+    },
   }
 
   if packer_bootstrap then

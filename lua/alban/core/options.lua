@@ -37,3 +37,12 @@ opt.splitright = true
 opt.splitbelow = true
 
 opt.iskeyword:append("-")
+
+-- disable mouse
+opt.mouse = ""
+
+-- Disable arrow keys in insert
+vim.api.nvim_set_keymap("i", "<up>", "<nop>", { noremap = true })
+vim.api.nvim_set_keymap("i", "<down>", "<nop>", { noremap = true })
+vim.api.nvim_set_keymap("i", "<left>", "<nop>", { noremap = true })
+vim.api.nvim_set_keymap("i", "<right>", "<nop>", { noremap = true })

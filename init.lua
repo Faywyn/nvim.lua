@@ -15,6 +15,7 @@ require("alban.plugins.treesitter")
 require("alban.plugins.gitsigns")
 require("alban.plugins.gen")
 require("alban.plugins.llama-copilot")
+require("alban.plugins.flutter-tools")
 
 require("alban.plugins.lsp.mason")
 require("alban.plugins.lsp.lspsaga")
