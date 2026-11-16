@@ -23,13 +23,12 @@ opt.scrolloff = 5
 
 -- appearance
 opt.termguicolors = true
-opt.background = "dark"
 opt.signcolumn = "yes"
 
 -- backspace
 opt.backspace = "indent,eol,start"
 
--- clipboard
+-- clipboard (Neovim on Windows ships win32yank, macOS uses pbcopy)
 opt.clipboard:append("unnamedplus")
 
 -- split windows
@@ -38,11 +37,41 @@ opt.splitbelow = true
 
 opt.iskeyword:append("-")
 
+-- persistent undo across sessions
+opt.undofile = true
+
 -- disable mouse
 opt.mouse = ""
 
--- Disable arrow keys in insert
-vim.api.nvim_set_keymap("i", "<up>", "<nop>", { noremap = true })
-vim.api.nvim_set_keymap("i", "<down>", "<nop>", { noremap = true })
-vim.api.nvim_set_keymap("i", "<left>", "<nop>", { noremap = true })
-vim.api.nvim_set_keymap("i", "<right>", "<nop>", { noremap = true })
+-- which-key popup delay
+opt.timeout = true
+opt.timeoutlen = 300
+
+-- remote plugin providers are not used by this config (faster startup, clean :checkhealth)
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
+-- netrw is replaced by nvim-tree (must be disabled before it loads)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Diagnostics: signs in the gutter (replaces the deprecated sign_define)
+vim.diagnostic.config({
+  severity_sort = true,
+  float = { border = "rounded", source = true },
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = " ",
+      [vim.diagnostic.severity.WARN] = " ",
+      [vim.diagnostic.severity.HINT] = "󰠠 ",
+      [vim.diagnostic.severity.INFO] = " ",
+    },
+  },
+})
+
+-- Disable arrow keys in insert mode
+for _, key in ipairs({ "<Up>", "<Down>", "<Left>", "<Right>" }) do
+  vim.keymap.set("i", key, "<Nop>")
+end
