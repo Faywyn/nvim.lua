@@ -13,6 +13,7 @@ local servers = {
   "clangd",
   "pyright",
   "texlab",
+  "copilot",               -- GitHub Copilot (inline suggestions, see ai.lua)
 }
 -- Other tools installed by Mason
 local tools = {
@@ -26,22 +27,29 @@ end
 
 local function on_attach(event)
   local client = vim.lsp.get_client_by_id(event.data.client_id)
-  local map = function(lhs, rhs, desc)
-    vim.keymap.set("n", lhs, rhs, { buffer = event.buf, silent = true, desc = desc })
+  local map = function(lhs, rhs, desc, mode)
+    vim.keymap.set(mode or "n", lhs, rhs, { buffer = event.buf, silent = true, desc = desc })
+  end
+  local jump = function(count)
+    return function() vim.diagnostic.jump({ count = count, float = true }) end
   end
 
-  map("gf", "<cmd>Lspsaga finder<CR>", "LSP finder (definition, references)")
+  -- same keys as with lspsaga; peeks open in a Glance window (<CR> opens, q closes)
+  map("gf", "<cmd>Glance references<CR>", "Peek references")
+  map("gd", "<cmd>Glance definitions<CR>", "Peek definition")
   map("gD", vim.lsp.buf.declaration, "Go to declaration")
-  map("gd", "<cmd>Lspsaga peek_definition<CR>", "Peek definition")
-  map("gi", vim.lsp.buf.implementation, "Go to implementation")
-  map("<leader>ca", "<cmd>Lspsaga code_action<CR>", "Code action")
-  map("<leader>rn", "<cmd>Lspsaga rename<CR>", "Rename symbol")
-  map("<leader>D", "<cmd>Lspsaga show_line_diagnostics<CR>", "Line diagnostics")
-  map("<leader>d", "<cmd>Lspsaga show_cursor_diagnostics<CR>", "Cursor diagnostics")
-  map("[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", "Previous diagnostic")
-  map("]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", "Next diagnostic")
-  map("K", "<cmd>Lspsaga hover_doc<CR>", "Hover documentation")
-  map("<leader>o", "<cmd>Lspsaga outline<CR>", "Toggle outline")
+  map("gi", "<cmd>Glance implementations<CR>", "Peek implementations")
+  map("gy", "<cmd>Glance type_definitions<CR>", "Peek type definition")
+  map("K", vim.lsp.buf.hover, "Hover documentation")
+  map("<leader>ca", vim.lsp.buf.code_action, "Code action", { "n", "x" })
+  map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
+  map("<leader>D", function() vim.diagnostic.open_float({ scope = "line" }) end, "Line diagnostics")
+  map("<leader>d", function() vim.diagnostic.open_float({ scope = "cursor" }) end, "Cursor diagnostics")
+  map("[d", jump(-1), "Previous diagnostic")
+  map("]d", jump(1), "Next diagnostic")
+  map("<leader>ci", function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }), { bufnr = event.buf })
+  end, "Toggle inlay hints")
 
   -- TypeScript helpers (were provided by the archived typescript.nvim)
   if client and client.name == "vtsls" then
@@ -140,12 +148,12 @@ return {
     dependencies = {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
+      "saghen/blink.cmp",
     },
     config = function()
-      -- defaults for every server: completion capabilities from nvim-cmp
+      -- defaults for every server: completion capabilities from blink.cmp
       vim.lsp.config("*", {
-        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
       })
 
       -- Vue: vtsls loads the Vue TypeScript plugin shipped with vue-language-server
@@ -186,15 +194,29 @@ return {
     end,
   },
 
-  -- LSP UI (finder, peek definition, outline, code actions...)
+  -- peek definitions / references / implementations in a floating window
   {
-    "nvimdev/lspsaga.nvim",
-    event = "LspAttach",
-    dependencies = { "nvim-tree/nvim-web-devicons", "nvim-treesitter/nvim-treesitter" },
+    "dnlhc/glance.nvim",
+    cmd = "Glance",
     opts = {
-      scroll_preview = { scroll_down = "<C-f>", scroll_up = "<C-b>" },
-      definition = { keys = { edit = "<CR>" } },
-      lightbulb = { enable = false },
+      border = { enable = true },
+      list = { position = "left" },
+    },
+  },
+
+  -- code outline sidebar (LSP or Treesitter symbols)
+  {
+    "stevearc/aerial.nvim",
+    cmd = { "AerialToggle", "AerialNavToggle" },
+    keys = {
+      { "<leader>o", "<cmd>AerialToggle<CR>", desc = "Toggle outline" },
+      { "<leader>O", "<cmd>AerialNavToggle<CR>", desc = "Outline navigation popup" },
+    },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    opts = {
+      backends = { "lsp", "treesitter", "markdown" },
+      layout = { default_direction = "prefer_left" },
+      show_guides = true,
     },
   },
 }

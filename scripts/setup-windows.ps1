@@ -10,14 +10,15 @@ function Install-Pkg($id, [string[]]$extra = @()) {
     winget install --id $id -e --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity @extra | Out-Null
 }
 
-# 1. Tools: Neovim, Git, Node (npm-based LSPs, Copilot), ripgrep/fd (Telescope),
-#    zig (telescope-fzf-native), MSVC Build Tools (Treesitter parsers), Nerd Font (icons)
+# 1. Tools: Neovim, Git, Node (npm-based LSPs), ripgrep/fd (picker), lazygit, Claude Code CLI,
+#    MSVC Build Tools (Treesitter parsers), Nerd Font (icons)
 Install-Pkg 'Neovim.Neovim'
 Install-Pkg 'Git.Git'
 Install-Pkg 'OpenJS.NodeJS.LTS'
 Install-Pkg 'BurntSushi.ripgrep.MSVC'
 Install-Pkg 'sharkdp.fd'
-Install-Pkg 'zig.zig'
+Install-Pkg 'JesseDuffield.lazygit'
+Install-Pkg 'Anthropic.ClaudeCode'
 Install-Pkg 'DEVCOM.JetBrainsMonoNerdFont'
 if (-not (Get-ChildItem "${env:ProgramFiles(x86)}\Microsoft Visual Studio\*\BuildTools\VC\Tools\MSVC" -ErrorAction SilentlyContinue)) {
     Install-Pkg 'Microsoft.VisualStudio.2022.BuildTools' @('--override', '--quiet --wait --norestart --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended')

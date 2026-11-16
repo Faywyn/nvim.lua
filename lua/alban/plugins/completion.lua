@@ -1,17 +1,13 @@
 return {
-  -- snippet engine
+  -- snippet engine (VS Code snippets from friendly-snippets + personal Lua snippets)
   {
     "L3MON4D3/LuaSnip",
+    version = "v2.*",
     lazy = true,
     dependencies = { "rafamadriz/friendly-snippets" },
-    keys = {
-      { "<C-j>", function() require("luasnip").jump(1) end, mode = { "i", "s" }, silent = true },
-      { "<C-k>", function() require("luasnip").jump(-1) end, mode = { "i", "s" }, silent = true },
-    },
     config = function()
       local luasnip = require("luasnip")
       luasnip.config.set_config({ enable_autosnippets = true })
-      -- VS Code style snippets (friendly-snippets) + personal Lua snippets
       require("luasnip.loaders.from_vscode").lazy_load()
       require("luasnip.loaders.from_lua").lazy_load({
         paths = { vim.fn.stdpath("config") .. "/lua/alban/snippets" },
@@ -19,54 +15,45 @@ return {
     end,
   },
 
-  -- completion
+  -- completion menu (replaces nvim-cmp; same keys)
   {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "saadparwaiz1/cmp_luasnip",
-      "L3MON4D3/LuaSnip",
-      "onsails/lspkind.nvim",
-      "windwp/nvim-autopairs",
+    "saghen/blink.cmp",
+    version = "1.*", -- release tags ship a prebuilt fuzzy matcher
+    event = { "InsertEnter", "CmdlineEnter" },
+    dependencies = { "L3MON4D3/LuaSnip" },
+    opts = {
+      keymap = {
+        preset = "none",
+        ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide", "fallback" },
+        ["<CR>"] = { "accept", "fallback" },
+        -- <C-j>/<C-k>: move in the menu, otherwise jump between snippet fields
+        ["<C-j>"] = { "select_next", "snippet_forward", "fallback" },
+        ["<C-k>"] = { "select_prev", "snippet_backward", "fallback" },
+        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+        -- <Tab> is left to Copilot (see ai.lua)
+      },
+      completion = {
+        list = { selection = { preselect = false, auto_insert = true } },
+        documentation = { auto_show = true, auto_show_delay_ms = 200 },
+        menu = { border = "rounded" },
+      },
+      signature = { enabled = true, window = { border = "rounded" } },
+      snippets = { preset = "luasnip" },
+      sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+        per_filetype = { lua = { "lazydev", "lsp", "path", "snippets", "buffer" } },
+        providers = {
+          lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
+        },
+      },
+      cmdline = {
+        keymap = { preset = "cmdline", ["<C-j>"] = { "select_next" }, ["<C-k>"] = { "select_prev" } },
+        -- menu pops up for : commands, not while searching with / or ?
+        completion = { menu = { auto_show = function() return vim.fn.getcmdtype() == ":" end } },
+      },
+      fuzzy = { implementation = "prefer_rust_with_warning" },
     },
-    config = function()
-      local cmp = require("cmp")
-      local luasnip = require("luasnip")
-      local lspkind = require("lspkind")
-
-      vim.opt.completeopt = "menu,menuone,noselect"
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = false }),
-        }),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "buffer" },
-          { name = "path" },
-        }),
-        formatting = {
-          format = lspkind.cmp_format({ maxwidth = 50, ellipsis_char = "..." }),
-        },
-      })
-
-      -- insert () after a function/method completion
-      cmp.event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
-    end,
   },
 }

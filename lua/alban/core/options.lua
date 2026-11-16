@@ -57,6 +57,16 @@ vim.g.loaded_ruby_provider = 0
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- rounded borders on every floating window (hover, signature, diagnostics...)
+vim.o.winborder = "rounded"
+
+-- Neovim 0.11+ maps grn/gra/grr/gri/grt to LSP actions; they make `gr` (ReplaceWithRegister)
+-- wait for a second key. The same actions are on <leader>rn, <leader>ca, gf, gi, gy.
+for _, lhs in ipairs({ "grn", "gra", "grr", "gri", "grt", "grx" }) do
+  pcall(vim.keymap.del, "n", lhs)
+  pcall(vim.keymap.del, "x", lhs)
+end
+
 -- Diagnostics: signs in the gutter (replaces the deprecated sign_define)
 vim.diagnostic.config({
   severity_sort = true,
