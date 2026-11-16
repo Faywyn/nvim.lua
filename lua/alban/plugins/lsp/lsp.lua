@@ -181,10 +181,16 @@ return {
         callback = on_attach,
       })
 
-      -- installs missing servers and enables every installed one
+      -- installs missing servers and enables every installed one, except older servers
+      -- replaced here (still installed on machines set up before) that would duplicate them
       require("mason-lspconfig").setup({
         ensure_installed = servers,
-        automatic_enable = true,
+        automatic_enable = {
+          exclude = {
+            "ts_ls",   -- replaced by vtsls
+            "emmet_ls", -- replaced by emmet_language_server
+          },
+        },
       })
 
       -- OCaml: installed through opam (not Mason), enabled only if present

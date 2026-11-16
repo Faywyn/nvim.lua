@@ -18,10 +18,40 @@ return {
     dependencies = { "mason-org/mason.nvim" }, -- puts the tree-sitter CLI on PATH
     config = function()
       local ts = require("nvim-treesitter")
-      ts.install(parsers) -- async, no-op for parsers already installed
+
+      -- Parsers are built with the tree-sitter CLI. On a fresh machine Mason is still
+      -- downloading it when this runs, so wait for it instead of failing every parser.
+      local function with_cli(cb)
+        if vim.fn.executable("tree-sitter") == 1 then
+          return cb()
+        end
+        local ok, registry = pcall(require, "mason-registry")
+        if not ok then
+          return
+        end
+        local function hook(pkg)
+          pkg:once("install:success", vim.schedule_wrap(cb))
+          if not pkg:is_installing() then
+            pkg:install()
+          end
+        end
+        registry.refresh(function()
+          local found, pkg = pcall(registry.get_package, "tree-sitter-cli")
+          if found then
+            hook(pkg)
+          end
+        end)
+      end
+
+      with_cli(function()
+        ts.install(parsers) -- async, no-op for parsers already installed
+      end)
 
       -- blocking variant, usable headless: nvim --headless "+TSInstallAll" +qa
       vim.api.nvim_create_user_command("TSInstallAll", function()
+        if vim.fn.executable("tree-sitter") == 0 then
+          vim.cmd("MasonInstallAll")
+        end
         ts.install(parsers):wait(600000)
       end, { desc = "Install all configured Treesitter parsers and wait" })
 
@@ -45,6 +75,9 @@ return {
           local lang = vim.treesitter.language.get_lang(args.match)
           if not lang or attach(args.buf, lang) or not available[lang] then
             return
+          end
+          if vim.fn.executable("tree-sitter") == 0 then
+            return -- CLI not there yet; with_cli above installs the parsers once it is
           end
           ts.install(lang):await(function()
             vim.schedule(function()

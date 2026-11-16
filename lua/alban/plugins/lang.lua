@@ -5,7 +5,10 @@ return {
     lazy = false,
     init = function()
       if vim.fn.has("mac") == 1 then
-        vim.g.vimtex_view_method = "skim"
+        -- Skim when installed (SyncTeX), otherwise the default PDF app through `open`
+        local skim = vim.uv.fs_stat("/Applications/Skim.app")
+          or vim.uv.fs_stat(vim.fn.expand("~/Applications/Skim.app"))
+        vim.g.vimtex_view_method = skim and "skim" or "general"
       elseif vim.fn.has("win32") == 1 then
         vim.g.vimtex_view_method = vim.fn.executable("SumatraPDF") == 1 and "sumatrapdf" or "general"
       else
